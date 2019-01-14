@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import api from '../api';
 
 class JobsLoaderContainer extends Component {
 
@@ -37,7 +38,7 @@ class JobsLoaderContainer extends Component {
 
     readFile(evt) {
         axios
-            .get("http://localhost:8000/upload/read", {
+            .get(api["server-side"] + "/upload/read", {
                 onUploadProgress: ProgressEvent => {
                     this.setState({
                         loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),
@@ -61,7 +62,7 @@ class JobsLoaderContainer extends Component {
         data.append('file', this.state.selectedFile, this.state.selectedFile.name)
         //console.log(this.state.selectedFile, this.state.selectedFile.name);
         axios
-            .post("http://localhost:8000/upload", data, {
+            .post(api["server-side"] + "/upload", data, {
                 onUploadProgress: ProgressEvent => {
                     this.setState({
                         loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),

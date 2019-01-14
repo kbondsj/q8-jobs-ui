@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import _ from 'lodash';
+import api from '../api';
+import dateformat from 'dateformat';
 
 class ViewJobsContainer extends Component {
 
@@ -28,15 +30,28 @@ class ViewJobsContainer extends Component {
 
         this.setState({ selectedJob: selected });
     }
+
     render() {
+        let orderedJobs = [];
+        if(this.state.jobs.length > 0){
+            orderedJobs = _(this.state.jobs).sortBy((d)=> d["Date Vendor Submissions Stop"]).reverse().value();
+            //orderedJobs = _.sortBy(this.state.jobs, (d)=> d["Date Vendor Submissions Stop"]);
+        }
+        console.log("ordered" , orderedJobs);
         return (
             <Container>
                 <FlexBox>
                     <JobList>
-                        {this.state.jobs.map((doc, idx) => {
+                        {orderedJobs.map((doc, idx) => {
                             return (
-                                <JobCard key={idx} onClick={() => this.showDetail(doc)}>
-                                    {`${doc["Request Number"]} - ${doc["Labor Category"]}`}
+                                <JobCard key={idx} 
+                                    onClick={() => this.showDetail(doc)} 
+                                    style={{backgroundColor : new Date(doc["Date Vendor Submissions Stop"]) > new Date() ?  'rgba(0,255,0,.1)' : 'rgba(255,0,0,.1'}}>
+                                        {`${doc["Request Number"]} - ${doc["Labor Category"]}`}
+                                        {   new Date(doc["Date Vendor Submissions Stop"]) > new Date() ?
+                                            <div>Final Submit: { dateformat(doc["Date Vendor Submissions Stop"], "mm-dd-yyyy")}</div> :
+                                            <div style={{textDecoration:'line-through'}}>Final Submit: { dateformat(doc["Date Vendor Submissions Stop"], "mm-dd-yyyy")}</div>
+                                        }
                                 </JobCard>
                             )
                         })}
@@ -51,7 +66,7 @@ class ViewJobsContainer extends Component {
 
     loadJobs = () => {
         axios
-            .get("http://localhost:8000/viewjobs", {
+            .get(api["server-side"] + "/viewjobs", {
                 onUploadProgress: ProgressEvent => {
                     /* this.setState({
                         loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),
