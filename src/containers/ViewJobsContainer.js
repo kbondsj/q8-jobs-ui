@@ -9,6 +9,7 @@ import { withStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ArrowBack from '@material-ui/icons/ArrowBack';
+import Add from '@material-ui/icons/Add';
 import {CSSTransition} from 'react-transition-group';
 import history from '../utils/history';
 
@@ -68,6 +69,9 @@ class ViewJobsContainer extends Component {
 
         return (
             <Container>
+                <div>
+                    <button className="btn btn-success" onClick={ ()=> history.push("/addjob") }><span><Add/></span>Add New Job</button>
+                </div>
                 <Toolbar>
                     <TextField
                         label="ID:"

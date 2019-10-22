@@ -5,6 +5,7 @@ import JobsLoaderContainer from './containers/JobsLoaderContainer';
 import ViewJobsContainer from './containers/ViewJobsContainer';
 import LoginContainer from './containers/LoginContainer';
 import JobDetailView from './containers/JobDetailView';
+import AddJobContainer from './containers/AddJobContainer';
 import q8logo from './images/q8-logo.png';
 import history from './utils/history';
 
@@ -20,6 +21,7 @@ class App extends Component {
           <Route exact path="/" component={LoginContainer} />
           <Route exact path="/uploadjobs" component={JobsLoaderContainer} />
           <Route exact path="/viewjobs" component={ViewJobsContainer} />
+          <Route exact path="/addjob" component={AddJobContainer} />
           <Route path="/viewjobs/job/:jobId" render={ (props) => 
             <JobDetailView jobId={props.match.params.jobId}/>
           }/>

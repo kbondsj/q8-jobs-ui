@@ -26,20 +26,18 @@ class LoginContainer extends React.Component {
                 <div>
                     <TextField 
                         label="Username"
-                        variant="outlined"
-                        
+                        variant="outlined"                        
                         />
                 </div>
                 <div>
                 <TextField 
                         label="Password"
                         variant="outlined"
-                        type="password"
-                        
+                        type="password"                        
                         />
                 </div>
                 <Toolbar>
-                    <Button onClick={this.login}>Login</Button>
+                    <Button onClick={this.login} color="primary" variant="contained">Login</Button>
                 </Toolbar>
             </Container>
 
