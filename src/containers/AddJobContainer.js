@@ -2,8 +2,16 @@ import React from 'react';
 import axios from 'axios';
 import api from '../api';
 import TextField from '@material-ui/core/TextField';
+import Snackbar from '@material-ui/core/Snackbar';
 import Button from '@material-ui/core/Button';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox'
 import styled from 'styled-components';
+import * as moment from 'moment';
+import * as uniqid from 'uniqid';
+import history from '../utils/history';
+
+
 import { makeStyles } from '@material-ui/styles';
 
 class AddJobContainer extends React.Component {
@@ -14,12 +22,23 @@ class AddJobContainer extends React.Component {
         this.state = {
             title: '',
             desc: '',
-            location: ''
+            location: '',
+            minRate: 0,
+            maxRate: 100,
+            closeDate: new Date().getTime().toString(),
+            requirements: '',
+            isTS: false,
+            open: false
         }
         this.updateTitle = this.updateTitle.bind(this);
         this.updateDesc = this.updateDesc.bind(this);
         this.updateLocation = this.updateLocation.bind(this);
+        this.updateRequirements = this.updateRequirements.bind(this);
+        this.updateCloseDate = this.updateCloseDate.bind(this);
+        this.updateMinRate = this.updateMinRate.bind(this);
+        this.updateMaxRate = this.updateMaxRate.bind(this);
         this.formSubmit = this.formSubmit.bind(this);
+        this.updateIsTS = this.updateIsTS.bind(this);
     }
 
     updateTitle(event){
@@ -31,24 +50,53 @@ class AddJobContainer extends React.Component {
     updateLocation(event){
         this.setState({location: event.target.value});
     }
+    updateRequirements(event){
+        this.setState({requirements: event.target.value})
+    }
+    updateCloseDate(event){
+        this.setState({closeDate: event.target.value})
+    }
+    updateMinRate(event){
+        this.setState({minRate: event.target.value})
+    }
+    updateMaxRate(event){
+        this.setState({maxRate: event.target.value})
+    }
+
+    updateIsTS(event){
+        this.setState({isTS: event.target.checked});
+    }
+
+    navigateViewJobs(){
+        history.push("/viewjobs");
+    }
 
     formSubmit(event){
-        console.log(this.state);
-        axios.post(api["post-jobs-api"], {
-                id: this.state.title,
-                desc: this.state.desc,
-                location: this.state.location
-            }).then((result)=> {
+        const params = {
+            id: uniqid('q8'),
+            title: this.state.title,
+            desc: this.state.desc,
+            location: this.state.location,
+            requirements: this.state.requirements,
+            minRate: this.state.minRate,
+            maxRate: this.state.maxRate,
+            closeDate: this.state.closeDate,
+            isTS: this.state.isTS,
+        }
+        console.log(params);
+        axios.post(api["post-jobs-api"], params).then((result)=> {
                 console.log("RESULTS: ", result);
+                //alert(result.data);
+                this.setState({ open: true });
             })
         event.preventDefault();
     }
-    
+
     render(){
         return (
         <div>
             <h1>Add a new job</h1>
-            <button onClick={ this.testApiGateway }>Test API Gateway</button>
+            <Button variant="contained" color="primary" type="button" onClick={this.navigateViewJobs}>Back</Button>
             <FormContainer>
 
             <form onSubmit={this.formSubmit}>
@@ -70,11 +118,65 @@ class AddJobContainer extends React.Component {
                     onChange={this.updateLocation} 
                     value={this.state.location}              
                     />
+
+                <TextField 
+                    label="Requirements"
+                    variant="outlined"
+                    onChange={this.updateRequirements} 
+                    value={this.state.requirements}
+                    multiline
+                    rows="4"
+                    />
+
+                <TextField 
+                    label="Close Date"
+                    variant="outlined"
+                    onChange={this.updateCloseDate} 
+                    value={this.state.closeDate}              
+                    />
+
+                <TextField 
+                    label="Min Rate"
+                    variant="outlined"
+                    onChange={this.updateMinRate} 
+                    value={this.state.minRate}              
+                    />
+                <TextField 
+                    label="Max Rate"
+                    variant="outlined"
+                    onChange={this.updateMaxRate} 
+                    value={this.state.maxRate}              
+                    />
+                <FormControlLabel
+                    control={
+                    <Checkbox
+                        checked={this.state.checkedB}
+                        onChange={this.updateIsTS}
+                        value="true"
+                        color="primary"
+                    />
+                    }
+                    label="Clearance Required"
+                />
+                
                 <Button variant="contained" color="primary" type="submit">Add</Button>
             </form>
                     </FormContainer>
             <span id="results"></span>
-            </div>);
+            <Snackbar anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                open={this.state.open}
+                autoHideDuration={6000}
+                onClose={this.handleClose}
+                ContentProps={{
+                    'aria-describedby': 'message-id',
+                }}
+                message={<span id="message-id">Job Saved Successfully</span>}>
+                
+            </Snackbar>
+        </div>);
     }
 
     testApiGateway(){

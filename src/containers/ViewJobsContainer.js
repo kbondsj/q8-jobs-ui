@@ -35,12 +35,12 @@ class ViewJobsContainer extends Component {
     }
 
     componentDidMount() {
-        this.loadJobs();
+            this.loadJobs();
     }
 
     showDetail(doc) {
-        let reqNo = doc["Request Number"];
-        let selected = _.find(this.state.jobs, { "Request Number": reqNo });
+        let reqNo = doc["Id"];
+        let selected = _.find(this.state.jobs, { "Id": reqNo });
 
         this.setState({ selectedJob: selected });
     }
@@ -55,23 +55,32 @@ class ViewJobsContainer extends Component {
         this.setState({selectedJob: null})
     }
 
+    getCardStyle = (date) => {
+        if(_.isEqual(date, 0)){
+            return 'rgba(0,255,0,.1)'
+        }
+        return  new Date(parseInt(date)) > new Date() ? 'rgba(0,255,0,.1)' : 'rgba(255,0,0,.1';
+    }
+
     render() {
         let { classes } = this.props
         let orderedJobs = [];
         if (this.state.jobs.length > 0) {
-            orderedJobs = _(this.state.jobs).sortBy((d) => d["Date Vendor Submissions Stop"]).reverse().value();
+            orderedJobs = _(this.state.jobs).sortBy((d) => d["Date"]).reverse().value();
             //orderedJobs = _.sortBy(this.state.jobs, (d)=> d["Date Vendor Submissions Stop"]);
             if (!_.isEmpty(this.state.searchText)) {
                 orderedJobs = _.filter(orderedJobs, (job) => job["Request Number"].includes(this.state.searchText));
             }
         }
 
-
+        console.log(this.state);
+//style={{ backgroundColor: new Date(parseInt(doc["Date"])) > new Date() ? 'rgba(0,255,0,.1)' : 'rgba(255,0,0,.1' }}>
         return (
             <Container>
-                <div>
-                    <button className="btn btn-success" onClick={ ()=> history.push("/addjob") }><span><Add/></span>Add New Job</button>
-                </div>
+                {//<div>
+                 //   <button className="btn btn-success" onClick={ ()=> history.push("/addjob") }><span><Add/></span>Add New Job</button>
+                //</div>
+                }
                 <Toolbar>
                     <TextField
                         label="ID:"
@@ -89,11 +98,20 @@ class ViewJobsContainer extends Component {
                             return (
                                 <JobCard key={idx}
                                     onClick={() => this.showDetail(doc)}
-                                    style={{ backgroundColor: new Date(doc["Date Vendor Submissions Stop"]) > new Date() ? 'rgba(0,255,0,.1)' : 'rgba(255,0,0,.1' }}>
-                                    {`${doc["Request Number"]} - ${doc["Labor Category"]}`}
-                                    {new Date(doc["Date Vendor Submissions Stop"]) > new Date() ?
-                                        <div>Final Submit: {dateformat(doc["Date Vendor Submissions Stop"], "mm-dd-yyyy")}</div> :
-                                        <div style={{ textDecoration: 'line-through' }}>Final Submit: {dateformat(doc["Date Vendor Submissions Stop"], "mm-dd-yyyy")}</div>
+                                    style={{ backgroundColor: this.getCardStyle(parseInt(doc["Date"]))}}>
+                                    {`${doc["Job_Type"]}`}
+                                    {   
+                                        //check for 0 which means no end date
+                                        parseInt(doc["Date"]) === 0 &&
+                                        <div>Final Submit: None</div>
+                                    }
+                                    {
+                                        parseInt(doc["Date"]) !== 0 && 
+                                        (
+                                            new Date(parseInt(doc["Date"])) > new Date() ?
+                                            <div>Final Submit: {dateformat(parseInt(doc["Date"]), "mm-dd-yyyy")}</div> :
+                                            <div style={{ textDecoration: 'line-through' }}>Final Submit: {dateformat(new Date(parseInt(doc["Date"])), "mm-dd-yyyy")}</div>
+                                        )
                                     }
                                 </JobCard>
                             )
@@ -115,7 +133,7 @@ class ViewJobsContainer extends Component {
 
     loadJobs = () => {
         axios
-            .get(api["server-side"] + "/viewjobs", {
+            .get(api["get-jobs-api"], {
                 onUploadProgress: ProgressEvent => {
                     /* this.setState({
                         loaded: (ProgressEvent.loaded / ProgressEvent.total * 100),
@@ -123,7 +141,7 @@ class ViewJobsContainer extends Component {
                 },
             })
             .then(res => {
-                this.setState({ jobs: res.data })
+                this.setState({ jobs: res.data.Items })
             })
     }
 
@@ -134,7 +152,7 @@ const JobDetailComponent = (props) => {
     let styles = {
         container: {
             textAlign: "left",
-            fontWeight: 100
+            fontWeight: 300,
         },
         closer: {
             position: 'absolute',
@@ -147,8 +165,17 @@ const JobDetailComponent = (props) => {
     };
 
     const viewFullPage = (event, id) => {
-        console.log(history, id);
+        //console.log(history, id);
         history.push("/viewjobs/job/"+id);
+    }
+
+    let details = [];
+    let reqs = [];
+    if(! _.isNull(props.job)){
+        reqs = _.split(props.job.Requirements, "\n");
+        let job = _.cloneDeep(props.job);
+        job.IsTS = !!job.IsTS ? "Yes" : "No";
+        details = Object.entries(job);
     }
 
 
@@ -170,27 +197,44 @@ const JobDetailComponent = (props) => {
                             <ExpandLess fontSize="small"/>
                         </IconButton>
                     </div>
-                    <h1 style={{ borderBottom: "1px solid #f1f1f1" }}>{props.job["Labor Category"]}</h1>
+                    <h1 style={{ borderBottom: "1px solid #f1f1f1" }}>{props.job["Job_Type"]}</h1>
                     <div style={styles.container}>
-                        <div className="styleAsAnchor" style={{padding: "10px 0"}} onClick={(e) => viewFullPage(e, props.job["Request Number"])}>View Full Details</div>
+                        {/*<div className="styleAsAnchor" style={{padding: "10px 0"}} onClick={(e) => viewFullPage(e, props.job["Request Number"])}>View Full Details</div>
                         <div className="form-group">
-                            <label>Job No.: </label><span>{props.job["Request Number"]}</span>
+                            <label>Job No.: </label><span>{props.job["Id"]}</span>
                         </div>
                         <div className="form-group">
-                            <label>Job Title: </label><span>{props.job["Labor Category"]}</span>
+                            <label>Job Title: </label><span>{props.job["Job_Type"]}</span>
                         </div>
                         <div className="form-group">
-                            <label>Location: </label><span>{props.job["Work Location"]}</span>
+                            <label>Location: </label><span>{props.job["Location"]}</span>
                         </div>
                         <div className="form-group">
-                            <label>Description: </label><span>{props.job["Work Description"]}</span>
+                            <label>Description: </label><span>{props.job["Description"]}</span>
                         </div>
                         <div className="form-group">
-                            <label>Mandatory Skills: </label><span>{props.job["Mandatory Skills"]}</span>
+                            <label>Mandatory Skills: </label><span>{props.job["Requirements"]}</span>
                         </div>
                         <div className="form-group">
-                            <label>Desired Skills: </label><span>{props.job["Desired Skills"]}</span>
-                        </div>
+                            <label>Desired Skills: </label><span>{props.job["IsTS"]}</span>
+                        </div>*/}
+
+                        { details.map( (detail, idx) => {
+                            //console.log(detail);
+                            return <div className="form-group" key={idx} style={{marginBottom: "15px"}}> 
+                                        <div>
+                                            <label>
+                                                {detail[0]}:
+                                            </label>
+                                        </div>
+                                        <div style={{paddingLeft: "10px", marginTop: "3px"}}>
+                                            <span>
+                                                {_.isEqual(detail[0], "Requirements") ? _.map(reqs, (req, i)=> <p key={i}>{req}</p>) : detail[1]}
+                                                {/*detail[1]*/}
+                                            </span>
+                                        </div>
+                                    </div>
+                                })}
                     </div>
                 </DescriptionPanel>
             }
@@ -271,7 +315,7 @@ const DescriptionPanel = styled.div`
 
     .form-group{
         margin-bottom: 10px;
-        font-size: 0.8em;
+        font-size: 1em;
     }
 `
 
@@ -285,7 +329,7 @@ const Toolbar = styled.div`
 
 const DisplayingDiv = styled.div`
     display: inline-block;
-    font-size: 0.8em;
+    font-size: 1em;
     align-self: flex-end;
 
 `
