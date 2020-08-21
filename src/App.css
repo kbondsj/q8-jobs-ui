@@ -32,7 +32,11 @@
   }
 }
 
-.nav-header{
+.nav-header {
   height: 50px;
   background-color: #ccc;
+}
+
+.filters-container {
+  display: flex;
 }
