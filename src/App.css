@@ -35,6 +35,9 @@
 .nav-header {
   height: 50px;
   background-color: #ccc;
+  text-align: left;
+  padding-left: 20px;
+  padding-top: 2px;
 }
 
 .filters-container {

@@ -12,10 +12,16 @@ import ArrowBack from "@material-ui/icons/ArrowBack";
 import { CSSTransition } from "react-transition-group";
 import history from "../utils/history";
 import { Typography } from "@material-ui/core";
+import { red } from "@material-ui/core/colors";
 
 const styles = (theme) => ({
   textFieldPadding: {
     padding: "12px 14px",
+  },
+  filtersContainer: {
+    borderTop: "1px solid #ccc",
+    borderBottom: "1px solid #ccc",
+    paddingTop: "8px",
   },
 });
 
@@ -248,12 +254,13 @@ const JobDetailComponent = (props) => {
 
   let details = [];
   let reqs = [];
-  if (!_.isNull(props.job)) {
-    reqs = _.split(props.job.Requirements, "\n");
-    let job = _.cloneDeep(props.job);
-    job.IsTS = !!job.IsTS ? "Yes" : "No";
-    details = Object.entries(job);
-  }
+  console.log("JOB", props.job);
+  // if (!_.isNull(props.job)) {
+  //   reqs = _.split(props.job.Requirements, "\n");
+  //   let job = _.cloneDeep(props.job);
+  //   job.IsTS = !!job.IsTS ? "Yes" : "No";
+  //   details = Object.entries(job);
+  // }
 
   return (
     <div style={{ padding: "10px", position: "relative", overflow: "hidden" }}>
@@ -280,37 +287,164 @@ const JobDetailComponent = (props) => {
               <ExpandLess fontSize="small" />
             </IconButton>
           </div>
-          <h1 style={{ borderBottom: "1px solid #f1f1f1" }}>
-            {props.job["Job_Type"]}
-          </h1>
+          <h1>{props.job["Job_Type"]}</h1>
           <div style={styles.container}>
-            {/*<div className="styleAsAnchor" style={{padding: "10px 0"}} onClick={(e) => viewFullPage(e, props.job["Request Number"])}>View Full Details</div>
-                        <div className="form-group">
-                            <label>Job No.: </label><span>{props.job["Id"]}</span>
-                        </div>
-                        <div className="form-group">
-                            <label>Job Title: </label><span>{props.job["Job_Type"]}</span>
-                        </div>
-                        <div className="form-group">
-                            <label>Location: </label><span>{props.job["Location"]}</span>
-                        </div>
-                        <div className="form-group">
-                            <label>Description: </label><span>{props.job["Description"]}</span>
-                        </div>
-                        <div className="form-group">
-                            <label>Mandatory Skills: </label><span>{props.job["Requirements"]}</span>
-                        </div>
-                        <div className="form-group">
-                            <label>Desired Skills: </label><span>{props.job["IsTS"]}</span>
-                        </div>*/}
+            {props.job.IsTS === true && (
+              <strong style={{ color: "red", fontWeight: "bold" }}>
+                {" "}
+                **TS/SCI with Full Scope Required**
+              </strong>
+            )}
+            <div
+              className="form-group"
+              key="key"
+              style={{ marginBottom: "30px" }}
+            >
+              {/* --------Description--------- */}
+              <div>
+                <h3
+                  style={{
+                    borderBottom: "1px solid #e1e1e1",
+                    paddingBottom: "5px",
+                    color: "#369bd1",
+                  }}
+                >
+                  Description
+                </h3>
+              </div>
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  marginTop: "3px",
+                  fontSize: "14px",
+                }}
+              >
+                <span>{props.job.Description}</span>
+              </div>
+
+              {/* --------Location--------- */}
+              <div>
+                <h3
+                  style={{
+                    borderBottom: "1px solid #e1e1e1",
+                    paddingBottom: "5px",
+                    color: "#369bd1",
+                  }}
+                >
+                  Location
+                </h3>
+              </div>
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  marginTop: "3px",
+                  fontSize: "14px",
+                }}
+              >
+                <span>{props.job.Location}</span>
+              </div>
+
+              {/* --------Date--------- */}
+              <div>
+                <h3
+                  style={{
+                    borderBottom: "1px solid #e1e1e1",
+                    paddingBottom: "5px",
+                    color: "#369bd1",
+                  }}
+                >
+                  Response due:
+                </h3>
+              </div>
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  marginTop: "3px",
+                  fontSize: "14px",
+                }}
+              >
+                <span>
+                  {new Date(parseInt(props.job.Date)).toLocaleString()}
+                </span>
+              </div>
+
+              {/* --------Requirements--------- */}
+              <div>
+                <h3
+                  style={{
+                    borderBottom: "1px solid #e1e1e1",
+                    paddingBottom: "5px",
+                    color: "#369bd1",
+                  }}
+                >
+                  Requirements
+                </h3>
+              </div>
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  marginTop: "3px",
+                  fontSize: "14px",
+                }}
+              >
+                <span>
+                  {_.map(_.split(props.job.Requirements, "\n"), (req, i) => {
+                    if (req.charCodeAt(0) === 8226) {
+                      return (
+                        <p key={i} style={{ marginLeft: "16px" }}>
+                          {req}
+                        </p>
+                      );
+                    } else if (req.charCodeAt(0) === 111) {
+                      return (
+                        <p key={i} style={{ marginLeft: "32px" }}>
+                          {req}
+                        </p>
+                      );
+                    } else {
+                      return (
+                        <p key={i} style={{ fontWeight: 400 }}>
+                          {req}
+                        </p>
+                      );
+                    }
+                  })}
+                </span>
+              </div>
+
+              {/* --------Rate--------- */}
+              <div>
+                <h3
+                  style={{
+                    borderBottom: "1px solid #e1e1e1",
+                    paddingBottom: "5px",
+                    color: "#369bd1",
+                  }}
+                >
+                  Rate:
+                </h3>
+              </div>
+              <div
+                style={{
+                  paddingLeft: "10px",
+                  marginTop: "3px",
+                  fontSize: "14px",
+                }}
+              >
+                <span>
+                  ${props.job.Min_Rate} - ${props.job.Max_Rate}{" "}
+                  <span>(Note: Rate varies upon experience and skill set)</span>
+                </span>
+              </div>
+            </div>
 
             {details.map((detail, idx) => {
               //console.log(detail);
 
               // don't want to display Id
-              if (detail[0] === "Id") {
+              /* if (detail[0] === "Id") {
                 return null;
-              }
+              } */
 
               return (
                 <div
