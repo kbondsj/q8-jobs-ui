@@ -87,7 +87,7 @@ class ViewJobsContainer extends Component {
     if (_.isEqual(date, 0)) {
       return "rgba(0,255,0,.1)";
     }
-    return new Date(parseInt(date)) > new Date()
+    return new Date(date) > new Date()
       ? "rgba(0,255,0,.1)"
       : "rgba(255,0,0,.1";
   };
@@ -174,25 +174,26 @@ class ViewJobsContainer extends Component {
                   key={idx}
                   onClick={() => this.showDetail(doc)}
                   style={{
-                    backgroundColor: this.getCardStyle(parseInt(doc["Date"])),
+                    backgroundColor: this.getCardStyle(doc["Date"]),
                   }}
                 >
                   {`${doc["Job_Type"]}`}
                   {//check for 0 which means no end date
-                  parseInt(doc["Date"]) === 0 && <div>Final Submit: None</div>}
-                  {parseInt(doc["Date"]) !== 0 &&
-                    (new Date(parseInt(doc["Date"])) > new Date() ? (
+                  doc["Date"] === 0 && <div>Final Submit: None</div>}
+                  {doc["Date"] !== 0 &&
+                    (new Date(doc["Date"]) > new Date() ? (
                       <div>
-                        Final Submit:{" "}
-                        {dateformat(parseInt(doc["Date"]), "mm-dd-yyyy")}
+                        Submit by:{" "}
+                        {
+                          doc["Date"]
+                        }
                       </div>
                     ) : (
                       <div style={{ textDecoration: "line-through" }}>
-                        Final Submit:{" "}
-                        {dateformat(
-                          new Date(parseInt(doc["Date"])),
-                          "mm-dd-yyyy"
-                        )}
+                        Submit by:{" "}
+                        {
+                          doc["Date"]
+                        }
                       </div>
                     ))}
                 </JobCard>
@@ -364,7 +365,7 @@ const JobDetailComponent = (props) => {
                 }}
               >
                 <span>
-                  {new Date(parseInt(props.job.Date)).toLocaleString()}
+                  {props.job.Date}
                 </span>
               </div>
 
@@ -438,49 +439,7 @@ const JobDetailComponent = (props) => {
               </div>
             </div>
 
-            {details.map((detail, idx) => {
-              //console.log(detail);
-
-              // don't want to display Id
-              /* if (detail[0] === "Id") {
-                return null;
-              } */
-
-              return (
-                <div
-                  className="form-group"
-                  key={idx}
-                  style={{ marginBottom: "30px" }}
-                >
-                  <div>
-                    <h3
-                      style={{
-                        borderBottom: "1px solid #e1e1e1",
-                        paddingBottom: "5px",
-                        color: "#369bd1",
-                      }}
-                    >
-                      {_.split(detail[0], "_").join(" ")}:
-                    </h3>
-                  </div>
-                  <div
-                    style={{
-                      paddingLeft: "10px",
-                      marginTop: "3px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    <span>
-                      {_.isEqual(detail[0], "Requirements")
-                        ? _.map(reqs, (req, i) => <p key={i}>{req}</p>)
-                        : _.isEqual(detail[0], "Date")
-                        ? new Date(parseInt(detail[1])).toLocaleString()
-                        : detail[1]}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            
           </div>
         </DescriptionPanel>
       )}

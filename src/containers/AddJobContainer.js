@@ -23,9 +23,9 @@ class AddJobContainer extends React.Component {
             title: '',
             desc: '',
             location: '',
-            minRate: 0,
-            maxRate: 100,
-            closeDate: new Date().getTime().toString(),
+            minRate: '',
+            maxRate: '',
+            closeDate: '',
             requirements: '',
             isTS: false,
             open: false
@@ -83,10 +83,9 @@ class AddJobContainer extends React.Component {
             closeDate: this.state.closeDate,
             isTS: this.state.isTS,
         }
-        console.log(params);
+        console.log("Params: ", params);
         axios.post(api["post-jobs-api"], params).then((result)=> {
                 console.log("RESULTS: ", result);
-                //alert(result.data);
                 this.setState({ open: true });
             })
         event.preventDefault();
@@ -110,7 +109,9 @@ class AddJobContainer extends React.Component {
                     label="Description"
                     variant="outlined"
                     onChange={this.updateDesc} 
-                    value={this.state.desc}          
+                    value={this.state.desc}
+                    multiline
+                    rows="4"         
                     />
                 <TextField 
                     label="Location"
@@ -132,7 +133,8 @@ class AddJobContainer extends React.Component {
                     label="Close Date"
                     variant="outlined"
                     onChange={this.updateCloseDate} 
-                    value={this.state.closeDate}              
+                    value={this.state.closeDate}
+                    placeholder="eg 02/03/2022"              
                     />
 
                 <TextField 
